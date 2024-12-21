@@ -1,3 +1,14 @@
+* 배포방법
+1. 터미널 진입 경로 : 프로젝트 경로(F:\workspace\main> )
+2. 명령어 수행 : ./gradlew build
+3. 명령어 수행 : docker build --tag xowls2933/main:main .
+4. 명령어 수행 : docker push xowls2933/main:main
+5. AWS 접속 후 도커 로그인 명령어 : docker login
+6. AWS docker hub 계정 접속 : xowls2933/dh84237802!
+7. AWS docker 이미지 pull 명령어 : docker pull xowls2933/main:main
+8. AWS docker 이미지 다운로드 확인 명령어 : docker images
+9. AWS docker AS-IS 이미지 삭제 명령어 : docker rmi [이미지id]
+
 * 리눅스 버전 : Linux ip-172-31-8-231.ap-northeast-2.compute.internal 6.1.115-126.197.amzn2023.x86_64 #1 SMP PREEMPT_DYNAMIC Tue Nov  5 17:36:57 UTC 2024 x86_64 x86_64 x86_64 GNU/Linux
 
 * Docker

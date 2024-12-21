@@ -5,7 +5,10 @@ FROM openjdk:17-jdk-slim AS build
 WORKDIR /app
 
 # 3. 빌드 파일 복사
-COPY build/libs/*.jar app.jar
+COPY /home/ec2-user/main/build/libs/*.jar app.jar
+
+# 컨테이너를 8001번 포트로 하겠다.
+EXPOSE 8001
 
 # 4. 애플리케이션 실행
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
