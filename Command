@@ -1,0 +1,287 @@
+* 리눅스 버전 : Linux ip-172-31-8-231.ap-northeast-2.compute.internal 6.1.115-126.197.amzn2023.x86_64 #1 SMP PREEMPT_DYNAMIC Tue Nov  5 17:36:57 UTC 2024 x86_64 x86_64 x86_64 GNU/Linux
+
+* Docker
+1) yum으로 Docker 설치
+
+sudo yum install docker -y
+2) 설치한 Docker 버전 확인
+
+docker -v  ==> Docker version 25.0.5, build 5dc9bcc
+3) Docker 실행
+
+sudo service docker start
+4) Docker 그룹에 sudo 추가 (인스턴스 접속 후 도커 바로 제어할 수 있도록)
+
+sudo usermod -aG docker ec2-user
+5) 인스턴스 재접속 후 Docker 명령어 실행해보기
+
+docker run hello-world
+
+
+===========================
+
+9. 컨테이너 삭제
+
+# docker rm <컨테이너명>
+# or
+# docker rm <컨테이너ID>
+
+# 1. 동작중인 컨테이너 확인
+$ docker ps
+CONTAINER ID   IMAGE          COMMAND                   CREATED          STATUS         PORTS                               NAMES
+c69f693f130f   mysql:latest   "docker-entrypoint.s…"   16 minutes ago   Up 2 minutes   0.0.0.0:3306->3306/tcp, 33060/tcp   mysql-container
+
+# 2. 컨테이너 중지
+$ docker stop mysql-container
+mysql-container
+
+# 3. 동작중인 컨테이너 확인
+$ docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
+# 4. 컨테이너 삭제
+$ docker rm mysql-container
+mysql-container
+
+# 5. 모든 컨테이너 확인
+$ docker ps -a
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
+============================
+
+10. docker image 삭제
+
+# docker rmi <레파지토리명>
+# or
+# docker rmi <레파지토리명>:<태그>
+# or
+# docker rmi <이미지ID>
+
+# 1. 이미지 확인
+$ docker images
+REPOSITORY   TAG       IMAGE ID       CREATED       SIZE
+mysql        latest    a88c3e85e887   4 weeks ago   632MB
+
+# 2. 이미지 삭제
+$ docker rmi mysql:latest
+Untagged: mysql:latest
+Untagged: mysql@sha256:ff5ab9cdce0b4c59704b4e2a09deed5ab8467be795e0ea20228b8528f53fcf82
+Deleted: sha256:a88c3e85e887d78c6c16ee6a0a6297e09bd573193918a08f269a942ddad77856
+Deleted: sha256:a47e3f5184188d0ded58167f81ed399bda838b37716d6a0d9fb538ae64371767
+Deleted: sha256:750ea5242272cdbf344d0af35c4eff64c7b0296491bf9747214d4012c4feb391
+Deleted: sha256:2f17d48c81db0969179826d20d81e1cd333676a714e293a19a6fdaa2d57b1f27
+Deleted: sha256:bea3f162c4bd2492d6cfce9f715c60a61020205e82647343034c33c2d2c1c720
+Deleted: sha256:d3ad25eecba2cc8f5d837c5436fd4ce2230c51c6a6b206125b9dba76f83bd02f
+Deleted: sha256:8fb5524227094d3e8963e8bb93af8835a5928f34a072e2272aaf330b00fc3a58
+Deleted: sha256:3dcdcc4db1094b30a257b6feb414db6149934171333bc8c6ea543578021862ac
+Deleted: sha256:706b673eebeed9bc92da642eee3a1f5ea076e149b98491624ce7436ee40d115d
+Deleted: sha256:ed862c4f3420f8cdf5fb1160305a714585ffd0cc739c6f6306c750e82d50cd75
+Deleted: sha256:55d310cc1793fd699f7389585b86d5ff0270ad8f516f81db295e51e12f6d0b5b
+
+====================================
+
+Docker Image Pull 및 Run
+docker iamges는 jaspeen/oracle-xe-11g를 사용할 예정이다
+
+docker pull jaspeen/oracle-xe-11g
+
+docker run --name (컨테이너 이름) -d -p 9000:8080 -p 1521:1521 jaspeen/oracle-xe-11g
+
+DB 접속하기
+실행이 완료되었으면, bash 쉘로 컨테이너에 접속을 해야한다. SQLPlus를 이용해서 로그인이 바로 안되기 때문에 추가적인 설정이 필요하다.
+
+docker exec -it (컨테이너 이름) bash
+그 후 sqlplus 명령어를 입력하여 Oracle DB에 접속해준다
+
+sqlplus / as sysdba
+초기 계정같은 경우에는 user-name은 system이고 password는 oracle이다. 그 후 sys계정으로 다시 로그인한다. password는 동일하게 oracle이다.
+
+SQL> conn sys as sysdba
+유저 생성 및 권한 부여
+우선 자신이 사용할 계정을 생성해준다.다만 password에 특수기호는 안되는듯 하였다.
+
+SQL> create user (id) identified by (password);
+
+
+=================================
+
+* secureCRT 인증 실패 시, 서버작업
+
+여러 SSH 클라이언트(securecrt, xshell, putty) 로 테스트해본 결과 로키 리눅스에서 ssh 접속만 가능하고 나머지는 auth methods 가 모두 실패하는 현상이 발생하였다.
+
+
+
+구글링을 해보니 최신 리눅스는 regacy encryption 을 지원하지 않는 것 같았다.
+
+해결 방법으로는 클라이언트 메소드를 바꾸거나 reqacy 를 지원하게 하는 방법으로 해결하면 될 것으로 보여 ssh 서버에 아래의 명령어를 실행하였다.
+
+update-crypto-policies --set LEGACY
+
+
+=================================
+
+* Docker 명령어
+ - Docker 실행 : service docker start
+ - Docker버전 조회 : docker version
+ - Docker 이미지 조회 : docker search [찾을 이미지명]
+ - Docker 이미지 내려받기 : docker pull [이미지명]:[버전(ex:latest)]
+ - Docker 이미지 확인 : docker images
+ - 다운받은 image로 Docker 컨테이너 생성 : docker run --name [이름] -e MARIADB_ROOT_PASSWORD=[비밀번호] -p 3306:3306 -d mariadb/server:latest
+ - 컨테이너 재시작 : docker restart [이름]
+ - 컨테이너 중지  : docker stop [이름]
+ - 컨테이너 시작  : docker start [이름]
+ - 컨테이너 킬    : docker kill [이름]
+ - 생성한 oracledb 컨테이너 진입 : docker exec -i -t [이름] bash
+ - 컨테이너 로그 조회 : docker logs
+ - 컨테이너 프로세스 조회 : docker ps -a
+ - Docker를 시스템 시작 시 자동 실행하도록 설정 : sudo systemctl enable docker
+ - Docker 권한을 부여하여 현재 사용자가 Docker를 실행할 수 있도록 설정 : sudo usermod -aG docker ec2-user
+ - 컨테이너 삭제 : docker rm [이름]
+ - JAVA 설치
+  > # OpenJDK 17 이미지 다운로드 : docker pull openjdk:17
+  > # Docker 컨테이너 실행 : docker run -it --name java17 openjdk:17 bash
+=================================
+ * sqlplus
+  - 계정 : system / root
+접속하고자는 PC나 서버에 오라클 Client가 설치된 경우에는 아래와 같이 접속할 수 있다.
+sqlplus 사용자/패스워드@//host:port/service_name
+host 앞의 '//' 문자는 IP를 입력할 경우 생략해도 된다. url을 입력할 경우에는 사용해야 하니, 평소 사용하는 습관을 들이는 것이 좋을 듯하다. port도 오라클 DB 기본 port인 1521인 경우에는 생략해도 되나, 습관적으로 사용하는 것이 좋겠다.
+주의할 것은 service_name에는 반드시 SID가 아닌 service_name을 사용해야 한다.
+SID를 사용할 경우 ORA-01017 : invalid username/password:login denied 오류가 발생한다.
+
+Oracle DB가 설치된 컨테이너에서 SQL 명령어 수행
+
+$ sqlplus '/as sysdba'
+
+SQL> select name from v$database;
+NAME
+---------
+MONGO
+
+SQL> show con_name
+CON_NAME
+------------------------------
+CDB$ROOT
+
+SQL> show pdbs
+    CON_ID CON_NAME                       OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+         2 PDB$SEED                          READ ONLY  NO
+         3 MONGOPDB                       READ WRITE NO
+
+## PDB에 접속
+SQL> alter session set container=MONGOPDB;
+Session altered.
+
+## user 생성
+SQL> create user docker identified by "docker123";
+
+## 접속, resource 권한 부여
+SQL> grant connect, resource to docker;
+
+## users 테이블스페이스 사용 권한 설정
+SQL> alter user docker quota unlimited on users;
+=========================================================
+* cmd window -> aws 파일이동 scp 명령어 오류일 경우 해결법
+ [Bad permissions. Try removing permissions for user: BUILTIN\\Users (S-1-5-32-545) on file C:/main.pem.]
+ > scp -i C:\Users\xowls\Downloads\main.pem /workspace/main/bin/main.jar 3.38.149.1:/home/ec2-user
+
+	# cmd에서만 되고 powershell에서는 안됨
+	# myec2.pem 자리에 본인의 pem 파일 명을 대입하면 됨
+	# cmd는 pem 파일이 있는 폴더에서 실행해야 함
+
+	icacls.exe <파일명.pem> /reset
+	icacls.exe <파일명.pem> /grant:r %username%:(R)
+	icacls.exe <파일명.pem> /inheritance:r
+
+	ex)
+	icacls.exe my_ubuntu.pem /reset
+	icacls.exe my_ubuntu.pem /grant:r %username%:(R)
+	icacls.exe my_ubuntu.pem /inheritance:r
+
+=============================
+
+* 도커 빌드방법
+
+	/////M1 사용자 아닌 경우
+	docker build --tag [namespace]/[repository명]:[만들tag명] .
+  docker push [namespace]/[repository명]:[만든tag명]
+
+
+=======
+
+1. 스프링 부트 프로젝트 생성 - IntelliJ 기준
+1. IDE를 이용하여 직접 생성하기 1) 인텔리제이에서 [새 프로젝트] 버튼을 클릭한다. 2) Spring Initializr 를 선택한 후 위와 같이 입력 및 선택한다. (자바 11 기준) * 참고 : 일반적으로 그룹은 회사 사
+devmango.tistory.com
+
+
+* 스프링부트 프로젝트 웹 페이지 띄우기 참고: https://devmango.tistory.com/97
+
+ 
+
+2. Spring Boot localhost:8080 웹 페이지 띄우기
+1) preferences에서 들어간다. 2. gradle을 검색해서 선택 > 빌드 및 실행, 테스트 실행을 IntelliJ IDEA로 변경 - 위에 노란줄 설명을 보면 알겠지만 자바 프로젝트에서는 IDE를 사용하여 빌드하고 실행하는
+devmango.tistory.com
+
+
+1. jar 파일을 생성해준다. 참고 : https://devmango.tistory.com/101
+
+3. SpringBoot(스프링부트) 빌드 후 실행
+참고: 인텔리제이, 맥북 기준으로 작성된 글. 1. 인텔리제이에서 스프링부트가 실행되고 있다면 정지시켜준다. 2. 브라우저에서 localhost:8080 또는 화면을 띄울 로컬 url을 입력한 후 '사이트에 연결
+devmango.tistory.com
+
+
+2. 스프링 프로젝트(프로젝트 최상위에서 만들어주면 됨)에 Dockerfile을 만들어 준 다음 아래 내용을 넣어준다.
+# Docker를 올릴 때 jdk11 버전을 이용
+FROM openjdk:11
+
+EXPOSE ${SPRINGBOOT_PORT}
+
+ADD ./build/libs/*.jar app.jar
+
+# 도커파일이 도커엔진을 통해서 컨테이너로 올라갈 때,
+# 도커 컨테이너의 시스템 진입점이 어디인지를 알려준다.
+ENTRYPOINT ["java", "-jar", "-Duser.timezone=Asia/Seoul", "/app.jar"]
+3. https://www.docker.com/products/docker-desktop/ 에서 도커 데스트탑을 설치해준다.4. https://hub.docker.com/ 에서 회원가입을 한 후, repository를 만들어준다.
+
+
+
+5. 인텔리제이에서 InterlliJ IDEA -> Preferences... 선택 > 아래와 같이 선택해준다.(나 같은 경우 connnect 어쩌고 저쩌고 에러가 떠있는데, 캡쳐 당시 도커 데스크탑을 꺼둔 상태여서 그렇고 도커 데스크탑이 켜져있는 상태면 상관없다.) 
+
+
+
+
+6. 하단 서비스 탭에 들어가면 Docker 가 보이는데 연결을 해준다.
+
+
+7. 터미널에서 현재 작업 중인 폴더명으로 이동한 뒤 아래 명령어를 입력해준다.
+/////M1 사용자 아닌 경우
+docker build --tag [namespace]/[repository명]:[만들tag명] .
+/////M1 사용자는 아래 명령어
+docker build --platform amd64 --build-arg DEPENDENCY=build/dependency -t [namespace]/[repository명]:[만들tag명] .
+//2024.03.02 추가 위 명령어가 안 되는 경우 아래 명령어 입력(m1기준)
+docker build -t 이미지_이름:태그 --platform linux/amd64 .
+
+docker push [namespace]/[repository명]:[만든tag명]
+
+
+참고) M1 사용자는 위에 적힌 내용대로 안 써주면 마지막으로 image 받을걸 띄어보려고 할 때, waring: the requested image's platform (linux/arm64/v8) ... 어쩌고 에러가 난다. M1 호환성 문제때문이다.
+막판에 다 끝났다고 생각했는데 이 에러 만나면 진짜 빡친다. 그러므로 미리 docker 빌드할때 명령어를 잘 쓰자!
+
+
+ 7-1. 참고 - push는 ui로 할 수 있는거 같은데, 인텔리제이 버그인건지 네임스페이스칸에 무한로딩 걸리면서 작동되지 않는다. 그래서 터미널에서 직접 명령어로 해줬다.
+
+
+
+8. dockerhub에 image가 생성되어 push 된걸 확인할 수 있다.
+
+
+9.  pull 받을 서버에서 docker에 login 하여 아이디 패스워드를 입력한다. 그리고 아래 명령어를 순차적으로 입력한다.
+docker login
+docker images
+docker pull [dockerhub계정]/[repository명]:[tag명]
+docker images
+
+
+위 이미지는 davmango1128/stpring:test 인데 아래는 spring_test:test 인 이유는 m1 오류때문에 다시 테스트하고 캡쳐찍어서 그런거고 형식은 [계정]/reposiroty명:tag명 으로 입력하면 된다.
+
