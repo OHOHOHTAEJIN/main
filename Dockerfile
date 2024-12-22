@@ -5,7 +5,7 @@ FROM openjdk:17-jdk-slim AS build
 WORKDIR /app
 
 # 3. 빌드 파일 복사
-COPY main/build/libs/*.jar app.jar
+COPY build/libs/*.jar app.jar
 
 # 컨테이너를 8001번 포트로 하겠다.
 EXPOSE 8001

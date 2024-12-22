@@ -151,6 +151,16 @@ update-crypto-policies --set LEGACY
  - JAVA 설치
   > # OpenJDK 17 이미지 다운로드 : docker pull openjdk:17
   > # Docker 컨테이너 실행 : docker run -it --name java17 openjdk:17 bash
+  
+  # Docker Compose 설치
+$ sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+
+# Docker Compose 실행 권한 부여
+$ sudo chmod +x /usr/local/bin/docker-compose
+
+# 설치된 Docker Compose 실행 확인
+$ docker-compose --version
+Docker Compose version v2.20.2
 =================================
  * sqlplus
   - 계정 : system / root

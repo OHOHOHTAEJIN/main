@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stocks List</title>
+    <link rel="stylesheet" type="text/css" href="/css/styles.css"/>
+</head>
+<body>
+<header>
+    <div class="container">
+        <h1>Stock Market Overview</h1>
+        <p>Real-time stock data at your fingertips</p>
+    </div>
+</header>
+
+<div class="container">
+
+    <table class="stock-table">
+        <thead>
+        <tr>
+            <th>Symbol</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>changePercent</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="stock : ${stocks}">
+            <td th:text="${stock.symbol}"></td>
+            <td th:text="${stock.name}"></td>
+            <td th:text="${stock.price}"></td>
+            <td th:text="${stock.changePercent}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<footer>
+    <div class="container">
+        <p>&copy; 2024 Stock Tracker. All rights reserved.</p>
+    </div>
+</footer>
+</body>
+</html>
+
