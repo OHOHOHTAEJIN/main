@@ -1,21 +1,28 @@
 version: "3.9"  # optional since v1.27.0
 
 services:
-  db:
-    image: jaspeen/oracle-xe-11g
-    environment:
-      - ORACLE_PASSWORD=root
-      - ORACLE_SID=XE
-    ports:
-      - "1521:1521"
   app:
-    build: .
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: main
     environment:
       - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@db:1521:XE
       - SPRING_DATASOURCE_USERNAME=system
       - SPRING_DATASOURCE_PASSWORD=root
     ports:
       - "8001:8001"
+    depends_on:
+      - db
+  oracle:
+    image: jaspeen/oracle-xe-11g
+    container_name: oracle
+    environment:
+      - ORACLE_PASSWORD=root
+      - ORACLE_SID=XE
+    ports:
+      - "1521:1521"
+
   redis:
     image: redis
     networks:
